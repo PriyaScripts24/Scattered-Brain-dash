@@ -5,7 +5,6 @@ import {
   Settings,
   Plus,
   Search,
-  Filter,
   ChevronLeft,
   ChevronRight,
   X,
@@ -194,7 +193,7 @@ const initialAppointments = [
 
 function App() {
   const [view, setView] = useState("dashboard");
-  const [clients, setClients] = useState(initialClients);
+  const clients = useMemo(() => initialClients, []);
   const [appointments, setAppointments] = useState(initialAppointments);
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
