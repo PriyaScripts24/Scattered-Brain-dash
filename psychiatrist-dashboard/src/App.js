@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Calendar,
   Users,
@@ -15,185 +15,187 @@ import {
   Pill,
   AlertCircle,
   Save,
+  Mail,
+  Phone,
 } from "lucide-react";
 
-// Mock data
-const initialClients = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    dob: "1985-03-15",
-    phone: "555-0101",
-    email: "sarah.j@email.com",
-    address: "123 Main St, City, State 12345",
-    emergencyContact: "John Johnson",
-    emergencyPhone: "555-0102",
-    consentGiven: true,
-    privacyAcknowledged: true,
-    presentingConcern: "Anxiety and depression",
-    goals: "Manage anxiety symptoms, improve sleep",
-    suicideRisk: true,
-    selfHarmRisk: false,
-    medications: [
-      {
-        id: 1,
-        name: "Sertraline 50mg",
-        prescribedDate: "2024-09-15",
-        status: "Active",
-      },
-      {
-        id: 2,
-        name: "Lorazepam 0.5mg PRN",
-        prescribedDate: "2024-10-01",
-        status: "Active",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    dob: "1992-07-22",
-    phone: "555-0201",
-    email: "m.chen@email.com",
-    address: "456 Oak Ave, City, State 12345",
-    emergencyContact: "Lisa Chen",
-    emergencyPhone: "555-0202",
-    consentGiven: true,
-    privacyAcknowledged: true,
-    presentingConcern: "ADHD management",
-    goals: "Improve focus and work performance",
-    suicideRisk: false,
-    selfHarmRisk: false,
-    medications: [
-      {
-        id: 3,
-        name: "Adderall XR 20mg",
-        prescribedDate: "2024-08-10",
-        status: "Active",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Emily Rodriguez",
-    dob: "1978-11-30",
-    phone: "555-0301",
-    email: "emily.r@email.com",
-    address: "789 Pine Rd, City, State 12345",
-    emergencyContact: "Carlos Rodriguez",
-    emergencyPhone: "555-0302",
-    consentGiven: true,
-    privacyAcknowledged: true,
-    presentingConcern: "Bipolar disorder management",
-    goals: "Mood stabilization, prevent episodes",
-    suicideRisk: false,
-    selfHarmRisk: true,
-    medications: [
-      {
-        id: 4,
-        name: "Lithium 300mg",
-        prescribedDate: "2024-07-20",
-        status: "Active",
-      },
-      {
-        id: 5,
-        name: "Quetiapine 100mg",
-        prescribedDate: "2024-07-20",
-        status: "Active",
-      },
-    ],
-  },
-];
-
-const initialAppointments = [
-  {
-    id: 1,
-    clientId: 1,
-    date: "2025-10-29",
-    time: "09:00",
-    status: "Confirmed",
-    type: "client",
-    notes:
-      "Patient reports improved sleep with current medication regimen. Anxiety levels remain moderate. Discussed coping strategies.",
-    checkedIn: false,
-  },
-  {
-    id: 2,
-    clientId: 2,
-    date: "2025-10-29",
-    time: "10:00",
-    status: "Confirmed",
-    type: "client",
-    notes: "",
-    checkedIn: false,
-  },
-  {
-    id: 3,
-    clientId: null,
-    date: "2025-10-29",
-    time: "11:00",
-    status: "Confirmed",
-    type: "personal",
-    title: "Lunch Break",
-    notes: "",
-    checkedIn: false,
-  },
-  {
-    id: 4,
-    clientId: 3,
-    date: "2025-10-29",
-    time: "14:00",
-    status: "Tentative",
-    type: "client",
-    notes: "",
-    checkedIn: false,
-  },
-  {
-    id: 5,
-    clientId: 1,
-    date: "2025-10-30",
-    time: "09:00",
-    status: "Confirmed",
-    type: "client",
-    notes: "",
-    checkedIn: false,
-  },
-  {
-    id: 6,
-    clientId: 2,
-    date: "2025-10-31",
-    time: "10:00",
-    status: "Completed",
-    type: "client",
-    notes:
-      "Medication adjustment discussed. Patient tolerating Adderall well. Follow up in 2 weeks.",
-    checkedIn: true,
-  },
-  {
-    id: 7,
-    clientId: 1,
-    date: "2025-11-05",
-    time: "09:00",
-    status: "Tentative",
-    type: "client",
-    notes: "",
-    checkedIn: false,
-  },
-  {
-    id: 8,
-    clientId: 3,
-    date: "2025-11-06",
-    time: "15:00",
-    status: "Tentative",
-    type: "client",
-    notes: "",
-    checkedIn: false,
-  },
-];
-
 function App() {
+  // Mock data
+  const initialClients = [
+    {
+      id: 1,
+      name: "Sarah Johnson",
+      dob: "1985-03-15",
+      phone: "555-0101",
+      email: "sarah.j@email.com",
+      address: "123 Main St, City, State 12345",
+      emergencyContact: "John Johnson",
+      emergencyPhone: "555-0102",
+      consentGiven: true,
+      privacyAcknowledged: true,
+      presentingConcern: "Anxiety and depression",
+      goals: "Manage anxiety symptoms, improve sleep",
+      suicideRisk: true,
+      selfHarmRisk: false,
+      medications: [
+        {
+          id: 1,
+          name: "Sertraline 50mg",
+          prescribedDate: "2024-09-15",
+          status: "Active",
+        },
+        {
+          id: 2,
+          name: "Lorazepam 0.5mg PRN",
+          prescribedDate: "2024-10-01",
+          status: "Active",
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: "Michael Chen",
+      dob: "1992-07-22",
+      phone: "555-0201",
+      email: "m.chen@email.com",
+      address: "456 Oak Ave, City, State 12345",
+      emergencyContact: "Lisa Chen",
+      emergencyPhone: "555-0202",
+      consentGiven: true,
+      privacyAcknowledged: true,
+      presentingConcern: "ADHD management",
+      goals: "Improve focus and work performance",
+      suicideRisk: false,
+      selfHarmRisk: false,
+      medications: [
+        {
+          id: 3,
+          name: "Adderall XR 20mg",
+          prescribedDate: "2024-08-10",
+          status: "Active",
+        },
+      ],
+    },
+    {
+      id: 3,
+      name: "Emily Rodriguez",
+      dob: "1978-11-30",
+      phone: "555-0301",
+      email: "emily.r@email.com",
+      address: "789 Pine Rd, City, State 12345",
+      emergencyContact: "Carlos Rodriguez",
+      emergencyPhone: "555-0302",
+      consentGiven: true,
+      privacyAcknowledged: true,
+      presentingConcern: "Bipolar disorder management",
+      goals: "Mood stabilization, prevent episodes",
+      suicideRisk: false,
+      selfHarmRisk: true,
+      medications: [
+        {
+          id: 4,
+          name: "Lithium 300mg",
+          prescribedDate: "2024-07-20",
+          status: "Active",
+        },
+        {
+          id: 5,
+          name: "Quetiapine 100mg",
+          prescribedDate: "2024-07-20",
+          status: "Active",
+        },
+      ],
+    },
+  ];
+
+  const initialAppointments = [
+    {
+      id: 1,
+      clientId: 1,
+      date: "2025-10-29",
+      time: "09:00",
+      status: "Confirmed",
+      type: "client",
+      notes:
+        "Patient reports improved sleep with current medication regimen. Anxiety levels remain moderate. Discussed coping strategies.",
+      checkedIn: false,
+    },
+    {
+      id: 2,
+      clientId: 2,
+      date: "2025-10-29",
+      time: "10:00",
+      status: "Confirmed",
+      type: "client",
+      notes: "",
+      checkedIn: false,
+    },
+    {
+      id: 3,
+      clientId: null,
+      date: "2025-10-29",
+      time: "11:00",
+      status: "Confirmed",
+      type: "personal",
+      title: "Lunch Break",
+      notes: "",
+      checkedIn: false,
+    },
+    {
+      id: 4,
+      clientId: 3,
+      date: "2025-10-29",
+      time: "14:00",
+      status: "Tentative",
+      type: "client",
+      notes: "",
+      checkedIn: false,
+    },
+    {
+      id: 5,
+      clientId: 1,
+      date: "2025-10-30",
+      time: "09:00",
+      status: "Confirmed",
+      type: "client",
+      notes: "",
+      checkedIn: false,
+    },
+    {
+      id: 6,
+      clientId: 2,
+      date: "2025-10-31",
+      time: "10:00",
+      status: "Completed",
+      type: "client",
+      notes:
+        "Medication adjustment discussed. Patient tolerating Adderall well. Follow up in 2 weeks.",
+      checkedIn: true,
+    },
+    {
+      id: 7,
+      clientId: 1,
+      date: "2025-11-05",
+      time: "09:00",
+      status: "Tentative",
+      type: "client",
+      notes: "",
+      checkedIn: false,
+    },
+    {
+      id: 8,
+      clientId: 3,
+      date: "2025-11-06",
+      time: "15:00",
+      status: "Tentative",
+      type: "client",
+      notes: "",
+      checkedIn: false,
+    },
+  ];
   const [view, setView] = useState("dashboard");
-  const clients = useMemo(() => initialClients, []);
+  const [clients, setClients] = useState(initialClients);
+  const [filteredClients, setFilteredClients] = useState([]);
   const [appointments, setAppointments] = useState(initialAppointments);
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -205,6 +207,117 @@ function App() {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [appointmentPage, setAppointmentPage] = useState(0);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [formData, setFormData] = useState({
+    id: null,
+    name: "",
+    dob: "",
+    email: "",
+    phone: "",
+    address: "",
+    emergencyContact: "",
+    emergencyPhone: "",
+    consentGiven: false,
+    privacyAcknowledged: false,
+    presentingConcern: "",
+    goals: "",
+    suicideRisk: false,
+    selfHarmRisk: false,
+    medications: [],
+  });
+  const [formErrors, setFormErrors] = useState({});
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.name.trim()) errors.name = "Name is required";
+    if (!formData.dob) errors.dob = "Date of birth is required";
+    if (!formData.email.trim()) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      errors.email = "Email is invalid";
+    if (!formData.phone.trim()) errors.phone = "Phone is required";
+    if (!formData.presentingConcern.trim())
+      errors.presentingConcern = "Presenting concern is required";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+  useEffect(() => {
+    // Filter clients based on search term
+    const results = clients.filter((c) =>
+      c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredClients(results);
+  }, [searchTerm, clients, setFilteredClients]);
+
+  // Disable scroll when modals are open
+  useEffect(() => {
+    document.body.style.overflow =
+      isFormOpen || selectedClient || showDeleteConfirm ? "hidden" : "auto";
+  }, [isFormOpen, selectedClient, showDeleteConfirm]);
+
+  const handleAddClient = () => {
+    if (!validateForm()) return;
+
+    if (formData.id) {
+      // Update client
+      setClients((prev) =>
+        prev.map((c) => (c.id === formData.id ? { ...formData } : c))
+      );
+    } else {
+      // Add new client
+      const newClient = { ...formData, id: Date.now() };
+      setClients((prev) => [...prev, newClient]);
+    }
+
+    setIsFormOpen(false);
+    resetForm();
+  };
+
+  const handleEditClient = (client) => {
+    setFormData(client);
+    setSelectedClient(null);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteClient = () => {
+    setClients(clients.filter((c) => c.id !== selectedClient.id));
+    setShowDeleteConfirm(false);
+    setSelectedClient(null);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      id: null,
+      name: "",
+      dob: "",
+      email: "",
+      phone: "",
+      address: "",
+      emergencyContact: "",
+      emergencyPhone: "",
+      consentGiven: false,
+      privacyAcknowledged: false,
+      presentingConcern: "",
+      goals: "",
+      suicideRisk: false,
+      selfHarmRisk: false,
+      medications: [],
+    });
+    setFormErrors({});
+  };
+
+  // const filteredClients = clients.filter((client) =>
+  //   client.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
+
+  const handleCheckInToggle = (id) => {
+    setAppointments((prevAppointments) =>
+      prevAppointments.map((apt) =>
+        apt.id === id ? { ...apt, checkedIn: !apt.checkedIn } : apt
+      )
+    );
+  };
 
   const [appointmentForm, setAppointmentForm] = useState({
     clientId: "",
@@ -353,10 +466,6 @@ function App() {
     }
   };
 
-  const handleCheckIn = (id) => {
-    handleUpdateAppointment(id, { checkedIn: true, status: "Confirmed" });
-  };
-
   const getCalendarDays = () => {
     const start = new Date(currentDate);
     start.setDate(start.getDate() - start.getDay());
@@ -387,9 +496,9 @@ function App() {
   };
 
   const Sidebar = () => (
-    <div className="w-64 bg-slate-800 text-white p-6 flex flex-col h-screen">
+    <div className="flex flex-col w-64 h-screen p-6 text-white bg-slate-800">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Psychiatrist Portal</h1>
+        <h1 className="text-xl font-bold">SCATTERED BRAIN</h1>
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -428,19 +537,19 @@ function App() {
 
   const DashboardView = () => (
     <div className="flex-1 p-8 overflow-auto bg-gray-100">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold">Dashboard</h2>
         <div className="flex space-x-3">
           <button
             onClick={() => setShowAppointmentModal(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
           >
             <Plus size={20} />
             <span>New Appointment</span>
           </button>
           <button
             onClick={() => setShowRecurringModal(true)}
-            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            className="flex items-center px-4 py-2 space-x-2 text-white bg-green-600 rounded-lg hover:bg-green-700"
           >
             <Clock size={20} />
             <span>Recurring</span>
@@ -448,15 +557,15 @@ function App() {
         </div>
       </div>
 
-      <div className="mb-6 flex space-x-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+      <div className="flex mb-6 space-x-4">
+        <div className="relative flex-1">
+          <Search className="absolute text-gray-400 left-3 top-3" size={20} />
           <input
             type="text"
             placeholder="Search clients..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg"
+            className="w-full py-2 pl-10 pr-4 border rounded-lg"
           />
         </div>
 
@@ -481,8 +590,8 @@ function App() {
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow mb-6">
-        <div className="p-4 border-b flex justify-between items-center">
+      <div className="mb-6 bg-white rounded-lg shadow">
+        <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-xl font-semibold">Calendar View</h3>
           <div className="flex space-x-2">
             <button
@@ -519,7 +628,7 @@ function App() {
         </div>
 
         <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => {
                 const newDate = new Date(currentDate);
@@ -530,7 +639,7 @@ function App() {
                 else newDate.setDate(newDate.getDate() - 1);
                 setCurrentDate(newDate);
               }}
-              className="p-2 hover:bg-gray-100 rounded"
+              className="p-2 rounded hover:bg-gray-100"
             >
               <ChevronLeft size={20} />
             </button>
@@ -558,7 +667,7 @@ function App() {
                 else newDate.setDate(newDate.getDate() + 1);
                 setCurrentDate(newDate);
               }}
-              className="p-2 hover:bg-gray-100 rounded"
+              className="p-2 rounded hover:bg-gray-100"
             >
               <ChevronRight size={20} />
             </button>
@@ -578,7 +687,7 @@ function App() {
                       isToday ? "bg-blue-50 border-blue-300" : ""
                     }`}
                   >
-                    <div className="font-semibold text-sm mb-2">
+                    <div className="mb-2 text-sm font-semibold">
                       {day.toLocaleDateString("en-US", {
                         weekday: "short",
                         month: "numeric",
@@ -633,12 +742,12 @@ function App() {
               <div
                 key={apt.id}
                 onClick={() => setSelectedAppointment(apt)}
-                className="p-4 hover:bg-gray-50 cursor-pointer"
+                className="p-4 cursor-pointer hover:bg-gray-50"
               >
-                <div className="flex justify-between items-start">
+                <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
-                      <h4 className="font-semibold text-lg">
+                      <h4 className="text-lg font-semibold">
                         {apt.type === "personal"
                           ? apt.title
                           : getClientName(apt.clientId)}
@@ -663,12 +772,12 @@ function App() {
                         {apt.status}
                       </span>
                       {apt.checkedIn && (
-                        <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800">
+                        <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded">
                           Checked In
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600 mt-1">
+                    <p className="mt-1 text-gray-600">
                       {new Date(`${apt.date}T${apt.time}`).toLocaleDateString(
                         "en-US",
                         {
@@ -682,19 +791,21 @@ function App() {
                     </p>
                   </div>
 
-                  {apt.type === "client" &&
-                    !apt.checkedIn &&
-                    apt.status !== "Completed" && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCheckIn(apt.id);
-                        }}
-                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                      >
-                        Check In
-                      </button>
-                    )}
+                  {apt.type === "client" && apt.status !== "Completed" && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCheckInToggle(apt.id);
+                      }}
+                      className={`px-3 py-1 rounded text-white font-medium transition-colors ${
+                        apt.checkedIn
+                          ? "bg-blue-100 text-blue-800 hover:bg-blue-600"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                    >
+                      {apt.checkedIn ? "Checked In" : "Check In"}
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -702,7 +813,7 @@ function App() {
         </div>
 
         {upcomingAppointments.length > 10 && (
-          <div className="p-4 border-t flex justify-between items-center">
+          <div className="flex items-center justify-between p-4 border-t">
             <button
               onClick={() =>
                 setAppointmentPage(Math.max(0, appointmentPage - 1))
@@ -733,37 +844,55 @@ function App() {
 
   const ClientsView = () => (
     <div className="flex-1 p-8 overflow-auto bg-gray-100">
-      <div className="flex justify-between items-center mb-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold">Client List</h2>
+        <button
+          onClick={() => {
+            resetForm();
+            setIsFormOpen(true);
+          }}
+          className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+        >
+          <Plus size={18} />
+          New Client
+        </button>
       </div>
 
+      {/* Search Bar */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+          <Search className="absolute text-gray-400 left-3 top-3" size={20} />
           <input
             type="text"
             placeholder="Search clients..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg"
+            className="w-full py-2 pl-10 pr-4 border rounded-lg"
           />
         </div>
       </div>
 
+      {/* Client Cards */}
       <div className="grid gap-4">
-        {clients
-          .filter((client) =>
-            client.name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((client) => (
+        {filteredClients.length === 0 ? (
+          <div className="p-12 text-center bg-white rounded-lg shadow">
+            <p className="text-xl text-gray-500">
+              {searchTerm
+                ? "No clients found matching your search"
+                : "No clients yet. Add your first client to get started."}
+            </p>
+          </div>
+        ) : (
+          filteredClients.map((client) => (
             <div
               key={client.id}
               onClick={() => setSelectedClient(client)}
-              className="bg-white rounded-lg shadow p-6 hover:shadow-lg cursor-pointer transition"
+              className="p-6 transition bg-white rounded-lg shadow cursor-pointer hover:shadow-lg"
             >
-              <div className="flex justify-between items-start">
+              <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
+                  <div className="flex items-center mb-2 space-x-3">
                     <h3 className="text-xl font-semibold">{client.name}</h3>
                     {(client.suicideRisk || client.selfHarmRisk) && (
                       <div className="flex items-center space-x-1 text-red-600">
@@ -778,7 +907,7 @@ function App() {
                   <p className="text-gray-600">
                     {client.email} • {client.phone}
                   </p>
-                  <p className="text-gray-700 mt-2 font-semibold">
+                  <p className="mt-2 font-semibold text-gray-700">
                     Presenting: {client.presentingConcern}
                   </p>
                 </div>
@@ -796,56 +925,384 @@ function App() {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
+
+      {/* Client Details Modal */}
+      {selectedClient && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          onClick={() => setSelectedClient(null)}
+        >
+          <div
+            className="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <div className="flex items-center space-x-3">
+                  <h3 className="text-2xl font-bold">{selectedClient.name}</h3>
+                  {(selectedClient.suicideRisk ||
+                    selectedClient.selfHarmRisk) && (
+                    <div className="flex items-center px-3 py-1 space-x-1 text-red-600 bg-red-100 rounded-full">
+                      <AlertCircle size={18} />
+                      <span className="text-sm font-semibold">High Risk</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedClient(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-gray-700">
+                <Calendar size={18} />
+                <span>
+                  <strong>DOB:</strong>{" "}
+                  {new Date(selectedClient.dob).toLocaleDateString()}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 text-gray-700">
+                <Mail size={18} />
+                <span>
+                  <strong>Email:</strong> {selectedClient.email}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 text-gray-700">
+                <Phone size={18} />
+                <span>
+                  <strong>Phone:</strong> {selectedClient.phone}
+                </span>
+              </div>
+
+              <div className="flex items-start gap-2 text-gray-700">
+                <FileText size={18} className="mt-1" />
+                <div>
+                  <strong>Presenting Concern:</strong>
+                  <p className="mt-1">{selectedClient.presentingConcern}</p>
+                </div>
+              </div>
+
+              <div className="p-4 border-l-4 border-red-500 bg-red-50">
+                <h4 className="mb-2 font-semibold">Risk Assessment</h4>
+                <div className="space-y-1">
+                  <p className="text-sm">
+                    <strong>Suicide Risk:</strong>{" "}
+                    {selectedClient.suicideRisk ? "Yes" : "No"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Self-Harm Risk:</strong>{" "}
+                    {selectedClient.selfHarmRisk ? "Yes" : "No"}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Pill size={18} />
+                  <h4 className="font-semibold">Medications</h4>
+                </div>
+                {selectedClient.medications.length > 0 ? (
+                  <div className="space-y-2">
+                    {selectedClient.medications.map((med, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-2 rounded bg-gray-50"
+                      >
+                        <span>{med.name}</span>
+                        <span
+                          className={`px-2 py-1 text-xs rounded ${
+                            med.status === "Active"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-200 text-gray-700"
+                          }`}
+                        >
+                          {med.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    No medications recorded
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2 pt-6 mt-6 border-t">
+              <button
+                onClick={() => handleEditClient(selectedClient)}
+                className="flex items-center gap-2 px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
+              >
+                <Edit2 size={16} /> Edit Client
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+              >
+                <Trash2 size={16} /> Delete Client
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
+            <h3 className="mb-4 text-xl font-bold text-red-600">
+              Confirm Deletion
+            </h3>
+            <p className="mb-6 text-gray-700">
+              Are you sure you want to delete{" "}
+              <strong>{selectedClient?.name}</strong>? This action cannot be
+              undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteClient}
+                className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Client Form */}
+      {isFormOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          onClick={() => setIsFormOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg p-6 bg-white rounded-lg shadow-lg max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">
+                {formData.id ? "Edit Client" : "Add New Client"}
+              </h3>
+              <button
+                onClick={() => setIsFormOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  placeholder="Full Name *"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className={`w-full p-2 border rounded ${
+                    formErrors.name ? "border-red-500" : ""
+                  }`}
+                />
+                {formErrors.name && (
+                  <p className="mt-1 text-sm text-red-500">{formErrors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="date"
+                  value={formData.dob}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dob: e.target.value })
+                  }
+                  className={`w-full p-2 border rounded ${
+                    formErrors.dob ? "border-red-500" : ""
+                  }`}
+                />
+                {formErrors.dob && (
+                  <p className="mt-1 text-sm text-red-500">{formErrors.dob}</p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email *"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className={`w-full p-2 border rounded ${
+                    formErrors.email ? "border-red-500" : ""
+                  }`}
+                />
+                {formErrors.email && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {formErrors.email}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="tel"
+                  placeholder="Phone *"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  className={`w-full p-2 border rounded ${
+                    formErrors.phone ? "border-red-500" : ""
+                  }`}
+                />
+                {formErrors.phone && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {formErrors.phone}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <textarea
+                  placeholder="Presenting Concern *"
+                  value={formData.presentingConcern}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      presentingConcern: e.target.value,
+                    })
+                  }
+                  className={`w-full p-2 border rounded ${
+                    formErrors.presentingConcern ? "border-red-500" : ""
+                  }`}
+                  rows="3"
+                ></textarea>
+                {formErrors.presentingConcern && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {formErrors.presentingConcern}
+                  </p>
+                )}
+              </div>
+
+              <div className="p-4 border rounded bg-gray-50">
+                <h4 className="mb-3 font-semibold">Risk Assessment</h4>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.suicideRisk}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          suicideRisk: e.target.checked,
+                        })
+                      }
+                      className="mr-2"
+                    />
+                    <span>Suicide Risk</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.selfHarmRisk}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          selfHarmRisk: e.target.checked,
+                        })
+                      }
+                      className="mr-2"
+                    />
+                    <span>Self-Harm Risk</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => setIsFormOpen(false)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddClient}
+                className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+              >
+                {formData.id ? "Update Client" : "Add Client"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
   const SettingsView = () => (
     <div className="flex-1 p-8 overflow-auto bg-gray-100">
-      <h2 className="text-3xl font-bold mb-6">Settings</h2>
+      <h2 className="mb-6 text-3xl font-bold">Settings</h2>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="text-xl font-semibold mb-4">Data Management</h3>
+      <div className="p-6 mb-6 bg-white rounded-lg shadow">
+        <h3 className="mb-4 text-xl font-semibold">Data Management</h3>
 
-        <div className="space-y-4">
-          <button className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <div className="space-y-4 ">
+          <button className="w-full px-4 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
             Export All Client Data
           </button>
 
-          <button className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <button className="w-full px-4 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700">
             Backup Database
           </button>
 
-          <button className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
+          <button className="w-full px-4 py-3 text-white bg-orange-600 rounded-lg hover:bg-orange-700">
             Generate Audit Report
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-xl font-semibold mb-4">Audit Trail</h3>
-        <p className="text-gray-600 mb-4">Recent system activities</p>
+      <div className="p-6 bg-white rounded-lg shadow">
+        <h3 className="mb-4 text-xl font-semibold">Audit Trail</h3>
+        <p className="mb-4 text-gray-600">Recent system activities</p>
 
         <div className="space-y-2 text-sm">
-          <div className="p-3 bg-gray-50 rounded">
+          <div className="p-3 rounded bg-gray-50">
             <span className="font-semibold">Appointment Created:</span> Sarah
             Johnson - 2025-10-29 09:00
-            <div className="text-gray-500 text-xs mt-1">
+            <div className="mt-1 text-xs text-gray-500">
               By: Dr. Smith • 2025-10-28 14:30
             </div>
           </div>
-          <div className="p-3 bg-gray-50 rounded">
+          <div className="p-3 rounded bg-gray-50">
             <span className="font-semibold">Session Note Updated:</span> Michael
             Chen
-            <div className="text-gray-500 text-xs mt-1">
+            <div className="mt-1 text-xs text-gray-500">
               By: Dr. Smith • 2025-10-27 11:15
             </div>
           </div>
-          <div className="p-3 bg-gray-50 rounded">
+          <div className="p-3 rounded bg-gray-50">
             <span className="font-semibold">Medication Added:</span> Emily
             Rodriguez - Lithium 300mg
-            <div className="text-gray-500 text-xs mt-1">
+            <div className="mt-1 text-xs text-gray-500">
               By: Dr. Smith • 2025-10-26 16:00
             </div>
           </div>
@@ -859,13 +1316,13 @@ function App() {
     const [showClientCalendar, setShowClientCalendar] = useState(false);
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
         <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
-          <div className="p-6 border-b flex justify-between items-center">
+          <div className="flex items-center justify-between p-6 border-b">
             <div>
               <h2 className="text-2xl font-bold">{client.name}</h2>
               {(client.suicideRisk || client.selfHarmRisk) && (
-                <div className="flex items-center space-x-2 text-red-600 mt-1">
+                <div className="flex items-center mt-1 space-x-2 text-red-600">
                   <AlertCircle size={20} />
                   <span className="font-semibold">
                     Risk Factors: {client.suicideRisk && "Suicide"}{" "}
@@ -886,7 +1343,7 @@ function App() {
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <h3 className="font-semibold text-lg mb-3">
+                <h3 className="mb-3 text-lg font-semibold">
                   Personal Information
                 </h3>
                 <div className="space-y-2 text-sm">
@@ -908,7 +1365,7 @@ function App() {
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg mb-3">
+                <h3 className="mb-3 text-lg font-semibold">
                   Emergency Contact
                 </h3>
                 <div className="space-y-2 text-sm">
@@ -922,7 +1379,7 @@ function App() {
                   </p>
                 </div>
 
-                <h3 className="font-semibold text-lg mt-4 mb-3">Consent</h3>
+                <h3 className="mt-4 mb-3 text-lg font-semibold">Consent</h3>
                 <div className="space-y-2 text-sm">
                   <p>
                     ✓ Informed Consent: {client.consentGiven ? "Yes" : "No"}
@@ -936,7 +1393,7 @@ function App() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3">
+              <h3 className="mb-3 text-lg font-semibold">
                 Clinical Information
               </h3>
               <div className="space-y-2 text-sm">
@@ -952,7 +1409,7 @@ function App() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center space-x-2">
+              <h3 className="flex items-center mb-3 space-x-2 text-lg font-semibold">
                 <Pill size={20} />
                 <span>Current Medications</span>
               </h3>
@@ -960,7 +1417,7 @@ function App() {
                 {client.medications
                   .filter((m) => m.status === "Active")
                   .map((med) => (
-                    <div key={med.id} className="p-3 bg-blue-50 rounded-lg">
+                    <div key={med.id} className="p-3 rounded-lg bg-blue-50">
                       <div className="font-semibold">{med.name}</div>
                       <div className="text-sm text-gray-600">
                         Prescribed:{" "}
@@ -972,35 +1429,35 @@ function App() {
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-semibold text-lg flex items-center space-x-2">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="flex items-center space-x-2 text-lg font-semibold">
                   <FileText size={20} />
                   <span>Appointment History</span>
                 </h3>
                 <button
                   onClick={() => setShowClientCalendar(!showClientCalendar)}
-                  className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                  className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
                 >
                   {showClientCalendar ? "List View" : "Calendar View"}
                 </button>
               </div>
 
               {showClientCalendar ? (
-                <div className="border rounded-lg p-4">
-                  <div className="text-center text-gray-600 py-8">
+                <div className="p-4 border rounded-lg">
+                  <div className="py-8 text-center text-gray-600">
                     Client Calendar View - Shows appointment history in calendar
                     format
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-64 overflow-auto">
+                <div className="space-y-2 overflow-auto max-h-64">
                   {clientAppointments.map((apt) => (
                     <div
                       key={apt.id}
                       onClick={() => setSelectedAppointment(apt)}
-                      className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
+                      className="p-3 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex items-start justify-between">
                         <div>
                           <div className="font-semibold">
                             {new Date(
@@ -1008,7 +1465,7 @@ function App() {
                             ).toLocaleDateString()}{" "}
                             at {apt.time}
                           </div>
-                          <div className="text-sm text-gray-600 mt-1">
+                          <div className="mt-1 text-sm text-gray-600">
                             {apt.notes
                               ? apt.notes.substring(0, 100) +
                                 (apt.notes.length > 100 ? "..." : "")
@@ -1058,9 +1515,9 @@ function App() {
     };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
         <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
-          <div className="p-6 border-b flex justify-between items-center">
+          <div className="flex items-center justify-between p-6 border-b">
             <h2 className="text-2xl font-bold">Appointment Details</h2>
             <button
               onClick={onClose}
@@ -1072,13 +1529,13 @@ function App() {
 
           <div className="p-6 space-y-6">
             <div>
-              <h3 className="font-semibold text-lg mb-3">
+              <h3 className="mb-3 text-lg font-semibold">
                 {appointment.type === "personal"
                   ? appointment.title
                   : client?.name}
               </h3>
               {client && (client.suicideRisk || client.selfHarmRisk) && (
-                <div className="flex items-center space-x-2 text-red-600 mb-3">
+                <div className="flex items-center mb-3 space-x-2 text-red-600">
                   <AlertCircle size={20} />
                   <span className="font-semibold">
                     Risk Factors: {client.suicideRisk && "Suicide"}{" "}
@@ -1101,7 +1558,7 @@ function App() {
             </div>
 
             <div>
-              <label className="block font-semibold mb-2">Status</label>
+              <label className="block mb-2 font-semibold">Status</label>
               <select
                 value={editedStatus}
                 onChange={(e) => setEditedStatus(e.target.value)}
@@ -1118,7 +1575,7 @@ function App() {
 
             {appointment.type === "client" && (
               <div>
-                <label className="block font-semibold mb-2">
+                <label className="block mb-2 font-semibold">
                   Session Notes
                 </label>
                 <textarea
@@ -1129,16 +1586,16 @@ function App() {
                   rows={8}
                   className="w-full px-4 py-2 border rounded-lg resize-none"
                 />
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="mt-1 text-sm text-gray-500">
                   Last updated: {new Date().toLocaleString()}
                 </p>
               </div>
             )}
 
-            <div className="flex justify-between items-center pt-4 border-t">
+            <div className="flex items-center justify-between pt-4 border-t">
               <button
                 onClick={() => handleDeleteAppointment(appointment.id)}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="flex items-center px-4 py-2 space-x-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
               >
                 <Trash2 size={20} />
                 <span>Delete</span>
@@ -1159,7 +1616,7 @@ function App() {
                     </button>
                     <button
                       onClick={handleSave}
-                      className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                      className="flex items-center px-4 py-2 space-x-2 text-white bg-green-600 rounded-lg hover:bg-green-700"
                     >
                       <Save size={20} />
                       <span>Save</span>
@@ -1168,7 +1625,7 @@ function App() {
                 ) : (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="flex items-center px-4 py-2 space-x-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                   >
                     <Edit2 size={20} />
                     <span>Edit</span>
@@ -1191,9 +1648,9 @@ function App() {
       {view === "settings" && <SettingsView />}
 
       {showAppointmentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6 border-b flex justify-between items-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="w-full max-w-md bg-white rounded-lg">
+            <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-2xl font-bold">New Appointment</h2>
               <button
                 onClick={() => setShowAppointmentModal(false)}
@@ -1205,7 +1662,7 @@ function App() {
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block font-semibold mb-2">Type</label>
+                <label className="block mb-2 font-semibold">Type</label>
                 <select
                   value={appointmentForm.type}
                   onChange={(e) =>
@@ -1223,7 +1680,7 @@ function App() {
 
               {appointmentForm.type === "client" ? (
                 <div>
-                  <label className="block font-semibold mb-2">Client</label>
+                  <label className="block mb-2 font-semibold">Client</label>
                   <select
                     value={appointmentForm.clientId}
                     onChange={(e) =>
@@ -1244,7 +1701,7 @@ function App() {
                 </div>
               ) : (
                 <div>
-                  <label className="block font-semibold mb-2">Title</label>
+                  <label className="block mb-2 font-semibold">Title</label>
                   <input
                     type="text"
                     value={appointmentForm.title}
@@ -1261,7 +1718,7 @@ function App() {
               )}
 
               <div>
-                <label className="block font-semibold mb-2">Date</label>
+                <label className="block mb-2 font-semibold">Date</label>
                 <input
                   type="date"
                   value={appointmentForm.date}
@@ -1276,7 +1733,7 @@ function App() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Time</label>
+                <label className="block mb-2 font-semibold">Time</label>
                 <input
                   type="time"
                   value={appointmentForm.time}
@@ -1291,7 +1748,7 @@ function App() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Status</label>
+                <label className="block mb-2 font-semibold">Status</label>
                 <select
                   value={appointmentForm.status}
                   onChange={(e) =>
@@ -1309,7 +1766,7 @@ function App() {
 
               <button
                 onClick={handleCreateAppointment}
-                className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+                className="w-full py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
               >
                 Create Appointment
               </button>
@@ -1319,9 +1776,9 @@ function App() {
       )}
 
       {showRecurringModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6 border-b flex justify-between items-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="w-full max-w-md bg-white rounded-lg">
+            <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-2xl font-bold">Recurring Appointment</h2>
               <button
                 onClick={() => setShowRecurringModal(false)}
@@ -1333,7 +1790,7 @@ function App() {
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block font-semibold mb-2">Client</label>
+                <label className="block mb-2 font-semibold">Client</label>
                 <select
                   value={recurringForm.clientId}
                   onChange={(e) =>
@@ -1354,7 +1811,7 @@ function App() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Start Date</label>
+                <label className="block mb-2 font-semibold">Start Date</label>
                 <input
                   type="date"
                   value={recurringForm.startDate}
@@ -1369,7 +1826,7 @@ function App() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Time</label>
+                <label className="block mb-2 font-semibold">Time</label>
                 <input
                   type="time"
                   value={recurringForm.time}
@@ -1381,7 +1838,7 @@ function App() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">Frequency</label>
+                <label className="block mb-2 font-semibold">Frequency</label>
                 <select
                   value={recurringForm.frequency}
                   onChange={(e) =>
@@ -1399,7 +1856,7 @@ function App() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-2">
+                <label className="block mb-2 font-semibold">
                   Number of Occurrences
                 </label>
                 <input
@@ -1417,7 +1874,7 @@ function App() {
                 />
               </div>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <div className="p-3 border border-yellow-200 rounded-lg bg-yellow-50">
                 <p className="text-sm text-yellow-800">
                   All recurring appointments will be created as{" "}
                   <strong>Tentative</strong> and require individual
@@ -1427,7 +1884,7 @@ function App() {
 
               <button
                 onClick={handleCreateRecurring}
-                className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+                className="w-full py-3 font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700"
               >
                 Create Recurring Appointments
               </button>
@@ -1452,5 +1909,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
